@@ -28,8 +28,8 @@ class TestModel(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.model = DelayModel()
-        self.data = pd.read_csv(filepath_or_buffer="../data/data.csv")
-        
+        # Rewrote path
+        self.data = pd.read_csv(filepath_or_buffer="data/data.csv")
 
     def test_model_preprocess_for_training(
         self
@@ -90,8 +90,9 @@ class TestModel(unittest.TestCase):
     def test_model_predict(
         self
     ):
-        features = self.model.preprocess(
-            data=self.data
+        features, target = self.model.preprocess(
+            data=self.data,
+            target_column="delay"
         )
 
         predicted_targets = self.model.predict(
