@@ -2,6 +2,7 @@ import unittest
 
 from fastapi.testclient import TestClient
 from challenge import app
+from datetime import datetime
 
 
 class TestBatchPipeline(unittest.TestCase):
@@ -14,12 +15,15 @@ class TestBatchPipeline(unittest.TestCase):
                 {
                     "OPERA": "Aerolineas Argentinas", 
                     "TIPOVUELO": "N", 
-                    "MES": 3
+                    "MES": 3,
+                    "Fecha-O": datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
+                    "Fecha-I": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 }
             ]
         }
         # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0])) # change this line to the model of chosing
         response = self.client.post("/predict", json=data)
+        print(response)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"predict": [0]})
     

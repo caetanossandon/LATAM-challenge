@@ -20,6 +20,7 @@ class DelayModel:
             self.load_model()
 
     def preprocess(self, data: pd.DataFrame, target_column: str = None) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
+
         data['Fecha-O'] = pd.to_datetime(data['Fecha-O'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
         data['Fecha-I'] = pd.to_datetime(data['Fecha-I'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
         
@@ -54,11 +55,19 @@ class DelayModel:
         data['delay'] = np.where(data['min_diff'] > 15, 1, 0)
 
     def _one_hot_encode_features(self, data: pd.DataFrame) -> pd.DataFrame:
-        return pd.concat([
+        encoded_data = pd.concat([
             pd.get_dummies(data['OPERA'], prefix='OPERA'),
             pd.get_dummies(data['TIPOVUELO'], prefix='TIPOVUELO'),
             pd.get_dummies(data['MES'], prefix='MES')
-        ], axis=1)[self.top_features]
+        ], axis=1)
+        
+        # Ensure all columns in self.top_features are present
+        for col in self.top_features:
+            if col not in encoded_data.columns:
+                encoded_data[col] = 0
+
+        return encoded_data[self.top_features]
+
 
     def save_model(self):
         """Save the trained model to a file."""
